@@ -45,7 +45,8 @@ defmodule Graveyard.Mixfile do
       licenses: ["MIT"],
       links: %{
         "Github" => github()
-      }
+      },
+      files: ["lib", "test", "mix.exs"]
     ]
   end
 end
