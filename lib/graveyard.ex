@@ -1,0 +1,2 @@
+defmodule Graveyard do
+end
