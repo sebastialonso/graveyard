@@ -5,7 +5,7 @@ use Mix.Config
 config :tirexs,
   :uri, "http://127.0.0.1:9200"
 
-config :graveyard,
-  index: "graveyard_test_index",
-  type: "graveyard_test_type",
-  mappings: CustomMappingsForGraveyard
+# config :graveyard,
+#   index: "graveyard_test_index",
+#   type: "graveyard_test_type",
+#   mappings: CustomMappingsForGraveyard

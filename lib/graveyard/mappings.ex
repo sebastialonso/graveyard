@@ -3,14 +3,36 @@ defmodule Graveyard.Mappings do
   Builds both mappings and settings into ElasticSearch
   """
   alias Graveyard.Support
+  alias Graveyard.Errors
+  alias Graveyard.Utils
   import Tirexs.Index.Settings
 
   @doc """
   Returns the mappings from the module indicated in `config.exs`
   """
   def get_mappings(index_name \\ Support.index(), type_name \\ Support.type()) do
-    module = Support.mappings
-    module.get_mappings(index_name, type_name)
+    mappings_from_config = cond do
+      !is_nil(Support.mappings_module) ->
+        module = Support.mappings_module
+        try do
+          module.get_mappings(index_name, type_name)
+        rescue
+          e in UndefinedFunctionError ->
+            raise Errors.WrongConfigModuleError
+        end
+      !is_nil(Support.mappings) ->
+        []
+      true -> 
+        raise Errors.WrongConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
+    end
+
+    properties_enhanced = mappings_from_config 
+      |> Keyword.fetch!(:mapping) 
+      |> Keyword.fetch!(:properties)
+      |> Keyword.merge(timestamps())
+      |> Keyword.merge(add_custom_keywords())
+
+    Keyword.take(mappings_from_config, [:index, :type]) ++ [mapping: [properties: properties_enhanced]]
   end
 
   @doc """
@@ -34,8 +56,34 @@ defmodule Graveyard.Mappings do
     base = get_settings(opts.index) ++ get_mappings(opts.index, opts.type)
       |> Keyword.delete_first(:index)
       |> Tirexs.Mapping.create_resource
-    # if base == :error do
-    #   raise "GraveyardError: ElasticSearch instance can't be reached"
-    # end
+
+    case base do
+      :error -> raise Errors.NoElasticSearchInstance
+       _ -> base 
+    end
+  end
+
+  defp timestamps() do
+     Utils.to_keyword_list(%{
+      created_at: graveyard_to_elastic(:datetime),
+      updated_at: graveyard_to_elastic(:datetime)
+    })
+  end
+
+  defp graveyard_to_elastic(type) do
+    case type do
+      :string -> %{type: "keyword"}
+      :category -> %{type: "keyword"}
+      :list -> %{type: "keyword"}
+      :text -> %{type: "text", analyzer: "nGram_analyzer"}
+      :date -> %{type: "date"}
+      :datetime -> %{type: "date", format: "dd/MM/yyyy HH:mm:ss"}
+      :integer -> %{type: "integer"}
+      :number -> %{type: "float"}
+    end
+  end
+
+  defp add_custom_keywords() do
+    []
   end
 end
