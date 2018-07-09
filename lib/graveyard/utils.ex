@@ -36,7 +36,7 @@ defmodule Graveyard.Utils do
     end)
   end
 
-  defp to_indifferent_atom(key) do
+  def to_indifferent_atom(key) do
     cond do
       is_atom(key) -> key
       is_binary(key) -> String.to_atom(key)

@@ -8,6 +8,7 @@ defmodule Graveyard.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
+      elixirc_path: elixirc_path(Mix.env),
       description: description(),
       source_url: github(),
       package: package()
@@ -25,6 +26,7 @@ defmodule Graveyard.Mixfile do
   defp deps do
     [
       {:tirexs, "~> 0.8"},
+      {:faker, "~> 0.10", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
@@ -49,4 +51,7 @@ defmodule Graveyard.Mixfile do
       files: ["lib", "test", "mix.exs"]
     ]
   end
+
+  defp elixirc_path(:test), do: ["lib", "test/support"]
+  defp elixirc_path(_), do: ["lib"]
 end

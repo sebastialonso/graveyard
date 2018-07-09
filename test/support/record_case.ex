@@ -4,6 +4,7 @@ defmodule Graveyard.RecordCase do
   using do
     quote do
       alias Graveyard.Support
+      alias Graveyard.Record
     end
   end
 

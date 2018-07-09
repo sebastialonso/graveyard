@@ -4,4 +4,6 @@ defmodule Graveyard.Record do
   """
   use Graveyard.ORM.Find
   use Graveyard.ORM.Insert
+  use Graveyard.ORM.Search
+  use Graveyard.ORM.Count
 end
