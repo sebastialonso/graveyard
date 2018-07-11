@@ -18,7 +18,7 @@ defmodule Graveyard.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :timex]
     ]
   end
 
@@ -27,6 +27,7 @@ defmodule Graveyard.Mixfile do
     [
       {:tirexs, "~> 0.8"},
       {:faker, "~> 0.10", only: :test},
+      {:timex, "~> 3.1"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end

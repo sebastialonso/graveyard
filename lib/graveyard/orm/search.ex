@@ -9,8 +9,6 @@ defmodule Graveyard.ORM.Search do
       # TODO Implemen is_empty? macro for lists
       def search(filters \\ [], page \\ 1, page_size \\ 10)
       def search(filters, page, page_size) do
-        IO.inspect "final query"
-        IO.inspect build_paginated_query(filters, page, page_size)
         build_paginated_query(filters, page, page_size)
         |> do_search
       end

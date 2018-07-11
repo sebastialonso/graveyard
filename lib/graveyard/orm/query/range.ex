@@ -19,8 +19,6 @@ defmodule Graveyard.ORM.Query.Range do
     else
       settings
     end
-    %{
-      range: Map.new([{to_indifferent_atom(filter["field"]), settings}]) 
-    }
+    %{range: Map.new([{to_indifferent_atom(filter["field"]), settings}])}
   end
 end
