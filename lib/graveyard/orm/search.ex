@@ -1,8 +1,8 @@
 defmodule Graveyard.ORM.Search do
   defmacro __using__(_) do
     quote do
-      alias unquote(Graveyard.Support)
-      alias unquote(Graveyard.Utils.TirexsUris)
+      alias Graveyard.Support
+      alias Graveyard.Utils.TirexsUris
       import Graveyard.Utils
       import Graveyard.ORM.Query
 
@@ -78,23 +78,5 @@ defmodule Graveyard.ORM.Search do
         |> round
       end
     end
-  end
-end
-
-defmodule Graveyard.Utils.TirexsUris do
-  import Tirexs.HTTP
-  import Graveyard.Utils
-  alias Graveyard.Support
-  
-  def count() do
-    post("#{Support.index()}/#{Support.type()}/_count")
-  end
-
-  def count(query) when is_map(query) do
-    post("#{Support.index()}/#{Support.type()}/_count", to_keyword_list(query))
-  end
-
-  def mappings() do
-    get("#{Support.index()}/_mapping/#{Support.type()}")
   end
 end

@@ -1,8 +1,7 @@
-defmodule Graveyard.ORM.CountTest do
+defmodule Graveyard.ORM.UpdateTest do
   use ExUnit.Case
 
   alias Graveyard.Record
-  alias Graveyard.Support
   alias Graveyard.Utils.TirexsUris
 
   defmodule CustomMappings do
@@ -28,18 +27,31 @@ defmodule Graveyard.ORM.CountTest do
   setup do
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
-    Enum.each(1..5, fn(_) -> 
-      Record.insert(%{
-        "title" => Faker.Name.name(),
-        "content" => Faker.Lorem.Shakespeare.hamlet()
-      })
-    end)
-    :ok
+    params = %{
+      "title" => "Henry",
+      "content" => "It's the Bilderberg group!"
+    }
+    {:ok, record} = Record.insert(params)
+
+    [record: record]
   end
 
-  describe "count/0" do
-    test "returns count of all elements" do
-      assert Record.count() == 5
+  describe "update/2" do
+    test "updates a record", %{record: record} do
+      params_to_update = %{
+        "title" => "Updated",
+        "content" => "Updated"
+      }
+      updated = Record.update(record.id, params_to_update)
+      assert updated
+      {:ok, updated} = updated
+      assert updated.title != record.title
+      assert updated.content != record.content
+    end
+
+    test "returns nil if record is not found", %{record: _} do
+      updated = Record.update(999, %{})
+      refute updated
     end
   end
 end

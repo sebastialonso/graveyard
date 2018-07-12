@@ -3,6 +3,7 @@ defmodule Graveyard.ORM.SearchTest do
 
   alias Graveyard.Record
   alias Graveyard.Support
+  alias Graveyard.Utils.TirexsUris
 
   defmodule CustomMappings do
     import Tirexs.Mapping
@@ -26,7 +27,7 @@ defmodule Graveyard.ORM.SearchTest do
   end
 
   setup do
-    Tirexs.HTTP.delete(Support.index())
+    TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
     docs = Enum.map(1..12, fn(i) -> 
       color = if rem(i, 2) == 1 do

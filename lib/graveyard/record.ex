@@ -6,4 +6,5 @@ defmodule Graveyard.Record do
   use Graveyard.ORM.Insert
   use Graveyard.ORM.Search
   use Graveyard.ORM.Count
+  use Graveyard.ORM.Update
 end
