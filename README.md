@@ -9,7 +9,7 @@ Just add
 ```elixir
 def deps do
   [
-    {:graveyard, "~> 0.1.0"}
+    {:graveyard, "~> 0.2.0"}
   ]
 end
 ```
