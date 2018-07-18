@@ -14,6 +14,7 @@ defmodule Graveyard.ORM.Find do
         %{index: index, type: type} = Map.merge(%{index: Support.index(), type: Support.type()}, opts)
         
         case get("#{index}/#{type}/#{id}") do
+          :error -> raise Graveyard.Errors.NoElasticSearchInstance
           {:error, status, object} ->
             if Map.get(opts, :log, false) do
               IO.inspect(status)
