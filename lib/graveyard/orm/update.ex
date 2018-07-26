@@ -2,6 +2,7 @@ defmodule Graveyard.ORM.Update do
   defmacro __using__(_opts) do
     quote do
       alias Graveyard.{Support, Record}
+      alias Graveyard.Utils
       alias Graveyard.Utils.TirexsUris
       import Tirexs.HTTP
 
@@ -11,7 +12,7 @@ defmodule Graveyard.ORM.Update do
           record ->
             updated = record
             |> Map.drop([:id])
-            |> Map.merge(params)
+            |> Map.merge(Utils.to_indifferent_map(params))
             
             case TirexsUris.update(id, params) do
               {:ok, 200, %{_id: id}} ->

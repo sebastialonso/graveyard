@@ -39,13 +39,11 @@ defmodule Graveyard.ORM.UpdateTest do
   describe "update/2" do
     test "updates a record", %{record: record} do
       params_to_update = %{
-        "title" => "Updated",
         "content" => "Updated"
       }
       updated = Record.update(record.id, params_to_update)
       assert updated
       {:ok, updated} = updated
-      assert updated.title != record.title
       assert updated.content != record.content
     end
 
