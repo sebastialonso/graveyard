@@ -14,7 +14,7 @@ defmodule Graveyard.ORM.Update do
             |> Map.drop([:id])
             |> Map.merge(Utils.to_indifferent_map(params))
             
-            case TirexsUris.update(id, params) do
+            case TirexsUris.update(id, updated) do
               {:ok, 200, %{_id: id}} ->
                 {:ok, Record.find(id)}
               {:error, status, reason} ->
