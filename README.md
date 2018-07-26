@@ -1,5 +1,7 @@
 # Graveyard
 
+[![Hex.pm](https://img.shields.io/badge/hex-0.2.1-blue.svg)](https://hex.pm/packages/graveyard)
+
 A teeny-tiny ORM/library for managing ElasticSearch
 
 ## Installation
@@ -9,7 +11,7 @@ Just add
 ```elixir
 def deps do
   [
-    {:graveyard, "~> 0.2.0"}
+    {:graveyard, "~> 0.2.1"}
   ]
 end
 ```
