@@ -15,8 +15,8 @@ defmodule Graveyard.Utils.TirexsUris do
     get("#{Support.index()}/_mapping/#{Support.type()}")
   end
 
-  def delete_mapping() do
-    delete(Support.index())
+  def delete_mapping(index \\ Support.index) do
+    delete(index)
   end
 
   def update(id, params) do

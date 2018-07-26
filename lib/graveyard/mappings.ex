@@ -5,6 +5,7 @@ defmodule Graveyard.Mappings do
   alias Graveyard.Support
   alias Graveyard.Errors
   alias Graveyard.Utils
+  alias Graveyard.Utils.TirexsUris
   import Tirexs.Index.Settings
 
   @doc """
@@ -61,6 +62,29 @@ defmodule Graveyard.Mappings do
       :error -> raise Errors.NoElasticSearchInstance
        _ -> base 
     end
+  end
+
+  def apply_mappings_change() do
+    temporal_index = [source: [index: Support.index(), type: Support.type()], dest: [index: "tmp", type: Support.type()]]
+    original_index = [source: [index: "tmp", type: Support.type()], dest: [index: Support.index(), type: Support.type()]]
+    
+    IO.inspect "1) Building temporal index..."
+    IO.inspect create_settings_and_mappings(%{index: "tmp", type: Support.type()})    
+
+    IO.inspect "2) Reindexing to tmp..."
+    IO.inspect Tirexs.HTTP.post("/_reindex?refresh", temporal_index)
+
+    IO.inspect "3) Deleting original index..."
+    IO.inspect TirexsUris.delete_mapping()
+
+    IO.inspect "4) Buliding new version of original index..."
+    IO.inspect create_settings_and_mappings()
+    
+    IO.inspect "5) Reindexing to original index..."
+    IO.inspect Tirexs.HTTP.post("/_reindex?refresh", original_index)
+
+    IO.inspect "6) Deleting temporal index..."
+    IO.inspect TirexsUris.delete_mapping("tmp")
   end
 
   defp timestamps() do
