@@ -5,32 +5,30 @@ defmodule Graveyard.Mappings do
   alias Graveyard.Support
   alias Graveyard.Errors
   alias Graveyard.Utils
+  alias Graveyard.Mappings.Basic
+  alias Graveyard.Mappings.Builder
   alias Graveyard.Utils.TirexsUris
   import Tirexs.Index.Settings
 
   @doc """
-  Returns the mappings from the module indicated in `config.exs`
+  Returns the mappings object processed from the configured mappings module or the configured map
   """
   def get_mappings(index_name \\ Support.index(), type_name \\ Support.type()) do
     mappings_from_config = cond do
+      is_nil(Support.mappings_module) and is_nil(Support.mappings) ->
+        raise Errors.ConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
       !is_nil(Support.mappings_module) ->
-        module = Support.mappings_module
-        try do
-          module.get_mappings(index_name, type_name)
-        rescue
-          e in UndefinedFunctionError ->
-            raise Errors.WrongConfigModuleError
-        end
-      !is_nil(Support.mappings) ->
-        []
+        Basic.get_mappings(index_name, type_name)
+      !is_nil(Support.mappings) or Enum.count(Support.mappings) < 1 ->
+        Builder.get_mappings(index_name, type_name)
       true -> 
-        raise Errors.WrongConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
+        raise Errors.ConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
     end
 
     properties_enhanced = mappings_from_config 
       |> Keyword.fetch!(:mapping) 
       |> Keyword.fetch!(:properties)
-      |> Keyword.merge(timestamps())
+      |> Keyword.merge(Builder.timestamps())
       |> Keyword.merge(add_custom_keywords())
 
     Keyword.take(mappings_from_config, [:index, :type]) ++ [mapping: [properties: properties_enhanced]]
@@ -59,11 +57,15 @@ defmodule Graveyard.Mappings do
       |> Tirexs.Mapping.create_resource
 
     case base do
-      :error -> raise Errors.NoElasticSearchInstance
+      :error -> raise Errors.ElasticSearchInstanceError
        _ -> base 
     end
   end
 
+  @doc """
+  To be used when the mappings have changed. It ppdates the current mappings with the new one, 
+  maintaining all records within the index.
+  """
   def apply_mappings_change() do
     temporal_index = [source: [index: Support.index(), type: Support.type()], dest: [index: "tmp", type: Support.type()]]
     original_index = [source: [index: "tmp", type: Support.type()], dest: [index: Support.index(), type: Support.type()]]
@@ -85,26 +87,6 @@ defmodule Graveyard.Mappings do
 
     IO.inspect "6) Deleting temporal index..."
     IO.inspect TirexsUris.delete_mapping("tmp")
-  end
-
-  defp timestamps() do
-     Utils.to_keyword_list(%{
-      created_at: graveyard_to_elastic(:datetime),
-      updated_at: graveyard_to_elastic(:datetime)
-    })
-  end
-
-  defp graveyard_to_elastic(type) do
-    case type do
-      :string -> %{type: "keyword"}
-      :category -> %{type: "keyword"}
-      :list -> %{type: "keyword"}
-      :text -> %{type: "text", analyzer: "nGram_analyzer"}
-      :date -> %{type: "date"}
-      :datetime -> %{type: "date", format: "dd/MM/yyyy HH:mm:ss"}
-      :integer -> %{type: "integer"}
-      :number -> %{type: "float"}
-    end
   end
 
   defp add_custom_keywords() do

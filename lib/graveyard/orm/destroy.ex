@@ -24,7 +24,7 @@ defmodule Graveyard.ORM.Destroy do
             nil
           :error ->
             IO.inspect "ERROR"
-            raise Graveyard.Errors.NoElasticSearchInstance
+            raise Graveyard.Errors.ElasticSearchInstanceError
           {:error, status, error} ->
             IO.inspect(status)
             IO.inspect(error)

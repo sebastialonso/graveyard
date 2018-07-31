@@ -29,6 +29,37 @@ defmodule Graveyard.MappingsTest do
     end
   end
 
+  @last_podcast_mappings %{
+    "episode" => %{"type" => :text},
+    "number" => %{"type" => :integer},
+    "hosts" => %{"type" => :list}
+  }
+
+  @advanced_last_podcast_mappings %{
+    "episode" => %{"type" => :text},
+    "number" => %{"type" => :integer},
+    "hosts" => %{"type" => :list},
+    "topic" => %{"type" => :object, "schema" => %{
+      "name" => %{"type" => :string},
+      "followers" => %{"type" => :integer},
+      "last_time_played" => %{"type" => :date}
+    }} 
+  }
+
+  @oblist_last_podcast_mappings %{
+    "episode" => %{"type" => :text},
+    "number" => %{"type" => :integer},
+    "hosts" => %{"type" => :list},
+    "topic" => %{"type" => :object, "schema" => %{
+      "name" => %{"type" => :string},
+      "followers" => %{"type" => :integer},
+      "last_time_played" => %{"type" => :date}
+    }},
+    "tags" => %{"type" => :oblist, "schema" => %{
+      "name" => %{"type" => :string}
+    }}
+  }
+
   setup do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
     Application.put_env(:graveyard, :index, "test_graveyard_index")
@@ -37,7 +68,7 @@ defmodule Graveyard.MappingsTest do
   end
 
   describe "get_mappings/2" do
-    setup do 
+    setup do
       Application.put_env(:graveyard, :type, "test_graveyard_type")
       :ok
     end
@@ -55,24 +86,65 @@ defmodule Graveyard.MappingsTest do
       assert Keyword.has_key?(properties, :updated_at)
     end
 
-    test "returns a mappings object with valid index key for map mappings" do
-      Application.put_env(:graveyard, :mappings_module, nil)
-      Application.put_env(:graveyard, :mappings, %{
-
-      })
-
-      assert nil
-    end    
-
     test "raise if custom mapping file has wrong function signature" do
       Application.put_env(:graveyard, :mappings_module, WrongSignatureMappings)
-      assert_raise Errors.WrongConfigModuleError, fn -> Mappings.get_mappings end
+      assert_raise Errors.ConfigModuleError, fn -> Mappings.get_mappings end
     end
 
+    test "returns a valid mappings object for flat map mappings" do
+      Application.put_env(:graveyard, :mappings_module, nil)
+      Application.put_env(:graveyard, :mappings, @last_podcast_mappings)
+
+      actual = Mappings.get_mappings()
+      properties = actual 
+        |> Keyword.fetch!(:mapping)
+        |> Keyword.fetch!(:properties)
+
+      assert Keyword.fetch!(actual, :index) == Application.get_env(:graveyard, :index)
+      assert Keyword.fetch!(actual, :type) == Application.get_env(:graveyard, :type)
+      assert Keyword.has_key?(properties, :created_at)
+      assert Keyword.has_key?(properties, :updated_at)
+    end
+
+    test "returns a valid mappings object for map mappings with object" do
+      Application.put_env(:graveyard, :mappings_module, nil)
+      Application.put_env(:graveyard, :mappings, @advanced_last_podcast_mappings)
+
+      actual = Mappings.get_mappings()
+      properties = actual 
+        |> Keyword.fetch!(:mapping)
+        |> Keyword.fetch!(:properties)
+
+      assert Keyword.fetch!(actual, :index) == Application.get_env(:graveyard, :index)
+      assert Keyword.fetch!(actual, :type) == Application.get_env(:graveyard, :type)
+      assert Keyword.has_key?(properties, :topic)
+      topic_properties = Keyword.fetch!(properties, :topic) |> Keyword.fetch!(:mapping) |> Keyword.fetch!(:properties)
+      assert Keyword.has_key?(topic_properties, :name)
+      assert Keyword.has_key?(topic_properties, :followers)
+      assert Keyword.has_key?(topic_properties, :last_time_played)
+    end
+
+    test "returns a valid mappings object for map mappings with oblists" do
+      Application.put_env(:graveyard, :mappings_module, nil)
+      Application.put_env(:graveyard, :mappings, @oblist_last_podcast_mappings)
+
+      actual = Mappings.get_mappings()
+      properties = actual 
+        |> Keyword.fetch!(:mapping)
+        |> Keyword.fetch!(:properties)
+
+      assert Keyword.fetch!(actual, :index) == Application.get_env(:graveyard, :index)
+      assert Keyword.fetch!(actual, :type) == Application.get_env(:graveyard, :type)
+      assert Keyword.has_key?(properties, :tags)
+      tags_properties = Keyword.fetch!(properties, :tags) |> Keyword.fetch!(:mapping) |> Keyword.fetch!(:properties)
+      assert Keyword.has_key?(tags_properties, :name)
+    end
+
+    # Test with both module and map mappings
     test "raise if config file has nil for mappings and mappings_module" do
       Application.put_env(:graveyard, :mappings_module, nil)
       Application.put_env(:graveyard, :mappings, nil)
-      assert_raise Errors.WrongConfigModuleError, fn -> Mappings.get_mappings end
+      assert_raise Errors.ConfigModuleError, fn -> Mappings.get_mappings end
     end
   end
 
@@ -91,7 +163,7 @@ defmodule Graveyard.MappingsTest do
 
     test "raise if no ElasticSearch is found" do
       Application.put_env(:tirexs, :uri, "http://nowheretobefound")
-      assert_raise Errors.NoElasticSearchInstance, fn -> Mappings.create_settings_and_mappings() end
+      assert_raise Errors.ElasticSearchInstanceError, fn -> Mappings.create_settings_and_mappings() end
     end
   end
 end

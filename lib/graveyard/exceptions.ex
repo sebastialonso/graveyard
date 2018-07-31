@@ -1,5 +1,5 @@
 defmodule Graveyard.Errors do
-  defmodule WrongConfigModuleError do
+  defmodule ConfigModuleError do
     defexception message: "Missing function"
 
     def full_message(error) do
@@ -7,7 +7,7 @@ defmodule Graveyard.Errors do
     end
   end
 
-  defmodule NoElasticSearchInstance do
+  defmodule ElasticSearchInstanceError do
     defexception message: "No ElasticSearch found"
   end
 end

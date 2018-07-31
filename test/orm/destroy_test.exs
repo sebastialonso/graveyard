@@ -56,7 +56,7 @@ defmodule Graveyard.ORM.DestroyTest do
 
     test "raise error if something fishy goes on", %{record: record} do
       Application.put_env(:tirexs, :uri, "http://localhost:9201")
-      assert_raise Graveyard.Errors.NoElasticSearchInstance, fn() -> Record.destroy(record._id) end
+      assert_raise Graveyard.Errors.ElasticSearchInstanceError, fn() -> Record.destroy(record._id) end
     end
   end
 end
