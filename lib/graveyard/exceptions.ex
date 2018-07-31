@@ -8,6 +8,10 @@ defmodule Graveyard.Errors do
   end
 
   defmodule ElasticSearchInstanceError do
-    defexception message: "No ElasticSearch found"
+    defexception message: "No ElasticSearch instance found"
+  end
+
+  defmodule BadArgument do
+    defexception message: "Illegal arguments were supplied"
   end
 end

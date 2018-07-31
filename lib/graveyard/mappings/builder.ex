@@ -4,15 +4,15 @@ defmodule Graveyard.Mappings.Builder do
   """
 
   alias Graveyard.Support
-  alias Graveyard.Errors
   alias Graveyard.Utils
 
   def get_mappings(index_name, type_name) do
-    build_recursively(Support.mappings)
+    [index: index_name, type: type_name, 
+      mapping: build_recursively(Support.mappings)]
   end
 
   defp build_recursively(config) do
-    properties = Enum.map(config, fn({key, value}) -> 
+    [{:properties, Enum.map(config, fn({key, value}) -> 
       if Map.has_key?(value, "schema") do
         {
           Utils.to_indifferent_atom(key), 
@@ -22,7 +22,7 @@ defmodule Graveyard.Mappings.Builder do
         {Utils.to_indifferent_atom(key), graveyard_to_elastic(value["type"])}
       end 
     end)
-    [mapping: [properties: properties], index: Support.index(), type: Support.type()]
+    }]
   end
 
   def timestamps() do
@@ -34,16 +34,16 @@ defmodule Graveyard.Mappings.Builder do
 
   defp graveyard_to_elastic(type) do
     case type do
-      :string -> %{type: "keyword"}
-      :category -> %{type: "keyword"}
-      :list -> %{type: "keyword"}
-      :text -> %{type: "text", analyzer: "nGram_analyzer"}
-      :date -> %{type: "date", format: "dd/MM/yyyy"}
-      :datetime -> %{type: "date", format: "dd/MM/yyyy HH:mm:ss"}
-      :integer -> %{type: "integer"}
-      :number -> %{type: "float"}
-      :object -> %{type: "object"}
-      :oblist -> %{type: "nested"}
+      :string -> [type: "keyword"]
+      :category -> [type: "keyword"]
+      :list -> [type: "keyword"]
+      :text -> [type: "text", analyzer: "nGram_analyzer"]
+      :date -> [type: "date", format: "dd/MM/yyyy"]
+      :datetime -> [type: "date", format: "dd/MM/yyyy HH:mm:ss"]
+      :integer -> [type: "integer"]
+      :number -> [type: "float"]
+      :object -> [type: "object"]
+      :oblist -> [type: "nested"]
     end
   end
 end
