@@ -19,14 +19,11 @@ defmodule Graveyard.ORM.SearchTest do
     end
   end
 
-  setup_all do
+  setup do
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
     Application.put_env(:graveyard, :mappings_module, CustomMappings)
-    :ok
-  end
-
-  setup do
+    
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
     docs = Enum.map(1..12, fn(i) -> 

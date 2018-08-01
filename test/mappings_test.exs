@@ -118,7 +118,7 @@ defmodule Graveyard.MappingsTest do
       assert Keyword.fetch!(actual, :index) == Application.get_env(:graveyard, :index)
       assert Keyword.fetch!(actual, :type) == Application.get_env(:graveyard, :type)
       assert Keyword.has_key?(properties, :topic)
-      topic_properties = Keyword.fetch!(properties, :topic) |> Keyword.fetch!(:mapping) |> Keyword.fetch!(:properties)
+      topic_properties = Keyword.fetch!(properties, :topic) |> Keyword.fetch!(:properties)
       assert Keyword.has_key?(topic_properties, :name)
       assert Keyword.has_key?(topic_properties, :followers)
       assert Keyword.has_key?(topic_properties, :last_time_played)
@@ -136,7 +136,7 @@ defmodule Graveyard.MappingsTest do
       assert Keyword.fetch!(actual, :index) == Application.get_env(:graveyard, :index)
       assert Keyword.fetch!(actual, :type) == Application.get_env(:graveyard, :type)
       assert Keyword.has_key?(properties, :tags)
-      tags_properties = Keyword.fetch!(properties, :tags) |> Keyword.fetch!(:mapping) |> Keyword.fetch!(:properties)
+      tags_properties = Keyword.fetch!(properties, :tags) |> Keyword.fetch!(:properties)
       assert Keyword.has_key?(tags_properties, :name)
     end
 
