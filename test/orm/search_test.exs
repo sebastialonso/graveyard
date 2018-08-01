@@ -23,9 +23,12 @@ defmodule Graveyard.ORM.SearchTest do
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
     Application.put_env(:graveyard, :mappings_module, CustomMappings)
+    Application.put_env(:graveyard, :mappings, nil)
     
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
+
+
     docs = Enum.map(1..12, fn(i) -> 
       color = if rem(i, 2) == 1 do
         "green"

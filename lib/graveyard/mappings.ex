@@ -7,6 +7,7 @@ defmodule Graveyard.Mappings do
   alias Graveyard.Utils
   alias Graveyard.Mappings.Basic
   alias Graveyard.Mappings.Builder
+  alias Graveyard.Mappings.Auxiliar
   alias Graveyard.Utils.TirexsUris
   import Tirexs.Index.Settings
 
@@ -14,13 +15,16 @@ defmodule Graveyard.Mappings do
   Returns the mappings object processed from the configured mappings module or the configured map
   """
   def get_mappings(index_name \\ Support.index(), type_name \\ Support.type()) do
+    is_module_present = is_nil(Support.mappings_module) == false
+    is_map_present = is_nil(Support.mappings) == false
+    
     mappings_from_config = cond do
-      is_nil(Support.mappings_module) and is_nil(Support.mappings) ->
+      !is_module_present and !is_map_present ->
         raise Errors.ConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
-      !is_nil(Support.mappings_module) ->
-        Basic.get_mappings(index_name, type_name)
-      !is_nil(Support.mappings) or Enum.count(Support.mappings) < 1 ->
+      is_map_present and Enum.count(Support.mappings) > 1 ->
         Builder.get_mappings(index_name, type_name)
+      is_module_present ->
+        Basic.get_mappings(index_name, type_name)
       true -> 
         raise Errors.ConfigModuleError, "Any of :mappings or :mappings_module must be set in config"
     end
@@ -30,6 +34,13 @@ defmodule Graveyard.Mappings do
       |> Keyword.fetch!(:properties)
       |> Keyword.merge(Builder.timestamps())
       |> Keyword.merge(add_custom_keywords())
+    
+    properties_enhanced = if is_map_present do
+      properties_enhanced
+        |> Keyword.merge(Auxiliar.build_auxiliar_mappings())
+    else
+      properties_enhanced
+    end
 
     Keyword.take(mappings_from_config, [:index, :type]) ++ [mapping: [properties: properties_enhanced]]
   end

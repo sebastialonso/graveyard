@@ -9,18 +9,17 @@ defmodule Graveyard.ORM.GroupTest do
   alias Graveyard.Support.Fixtures
 
   describe "group/3" do
-    @mappings Fixtures.mappings()
     setup do
       Application.put_env(:tirexs, :uri, "http://localhost:9200")
       Application.put_env(:graveyard, :index, "graveyard_test")
       Application.put_env(:graveyard, :type, "graveyard_test")
       Application.put_env(:graveyard, :mappings_module, nil)
-      Application.put_env(:graveyard, :mappings, @mappings)
+      Application.put_env(:graveyard, :mappings, Fixtures.with_object_mappings())
       
       TirexsUris.delete_mapping()
       Graveyard.Mappings.create_settings_and_mappings()
 
-      Enum.map(Fixtures.episodes(), fn(episode) -> Record.insert(episode) end)
+      Fixtures.create_episodes()
       :ok
     end
 
