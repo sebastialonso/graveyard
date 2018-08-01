@@ -1,8 +1,9 @@
 defmodule Graveyard.ORM.DestroyTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   alias Graveyard.Record
   alias Graveyard.Support
+  alias Graveyard.Errors
   alias Graveyard.Utils.TirexsUris
 
   defmodule CustomMappings do
@@ -17,16 +18,13 @@ defmodule Graveyard.ORM.DestroyTest do
     end
   end
 
-  setup_all do
-    Application.put_env(:tirexs, :uri, "http://localhost:9200")
-    Application.put_env(:graveyard, :index, "graveyard_test")
-    Application.put_env(:graveyard, :type, "graveyard_test")
-    Application.put_env(:graveyard, :mappings_module, CustomMappings)
-    :ok
-  end
-
   describe "destroy/2" do
     setup do
+      Application.put_env(:tirexs, :uri, "http://localhost:9200")
+      Application.put_env(:graveyard, :index, "graveyard_test")
+      Application.put_env(:graveyard, :type, "graveyard_test")
+      Application.put_env(:graveyard, :mappings_module, CustomMappings)
+
       TirexsUris.delete_mapping()
       Graveyard.Mappings.create_settings_and_mappings()
       record = %{
@@ -56,7 +54,7 @@ defmodule Graveyard.ORM.DestroyTest do
 
     test "raise error if something fishy goes on", %{record: record} do
       Application.put_env(:tirexs, :uri, "http://localhost:9201")
-      assert_raise Graveyard.Errors.ElasticSearchInstanceError, fn() -> Record.destroy(record._id) end
+      assert_raise Errors.ElasticSearchInstanceError, fn() -> Record.destroy(record._id) end
     end
   end
 end

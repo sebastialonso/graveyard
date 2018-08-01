@@ -35,6 +35,7 @@ defmodule Graveyard.ORM.Group do
   end
 
   alias Graveyard.Utils
+  alias Graveyard.Support
 
   def build_aggs_query(aggs) do
     %{"aggs" => Graveyard.ORM.Group.agg_node_element(aggs)}
@@ -65,10 +66,24 @@ defmodule Graveyard.ORM.Group do
     end
   end
 
-  # TODO
   def numeric_aggregations() do
-    %{document_count: %{cardinality: %{field: "_uid"}}}
-      |> Utils.to_keyword_list()
+    averagable_fields = Support.numerical_fields()
+    aggregations = if Enum.count(averagable_fields) != 0 do
+      averagable_fields |> Enum.reduce(%{}, fn(field, acc) -> 
+        cond do
+          String.starts_with?(field, "object") ->
+            lst = String.split(field, ".")
+            object_field = lst |> Enum.slice(1..(Enum.count(lst))) |> Enum.join(".")
+            Map.put(acc, Utils.to_indifferent_atom(object_field), %{avg: %{field: object_field}})
+          true ->
+            Map.put(acc, Utils.to_indifferent_atom(field), %{avg: %{field: field}})
+        end
+      end)
+    else
+      %{document_count: %{cardinality: %{field: "_uid"}}}
+    end
+    |> Map.put(:document_count, %{cardinality: %{field: "_uid"}})
+    |> Utils.to_keyword_list()
   end
 
   def term_aggregation(agg, next_node) do
@@ -94,24 +109,11 @@ defmodule Graveyard.ORM.Group do
     }
   end
 
-  def range_aggregation(agg, next_node) do
-    %{
-      "aggregation" => %{
-        "meta" => %{"field_name" => agg["key"], "type" => :range},
-        "range" => %{
-          "field" => agg["key"],
-          "ranges" => build_range_agg(agg)
-        },
-        "aggs" => next_node
-      }
-    }
-  end
-
   def build_range_agg(agg) do
     %{"min" => min, "step" => step, "max" => max} = agg["opts"]
     ranges = [%{to: min}]
     ranges = ranges ++ generate_intermediate_ranges(min, step, max, [])
-    ranges = ranges ++ [%{from: max}]
+    ranges ++ [%{from: max}]
   end
 
   def generate_intermediate_ranges(min, step, max, acc \\ []) do

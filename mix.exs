@@ -8,7 +8,7 @@ defmodule Graveyard.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
-      elixirc_path: elixirc_path(Mix.env),
+      elixirc_paths: elixirc_path(Mix.env),
       description: description(),
       source_url: github(),
       package: package()
