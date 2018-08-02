@@ -28,7 +28,7 @@ defmodule Graveyard.ORM.Group do
       end
 
       def group(filters, aggs, opts) do
-        raise Errors.BadArgument
+        raise Errors.BadArgumentError
       end
     end
   end
@@ -61,7 +61,7 @@ defmodule Graveyard.ORM.Group do
     case head_agg["type"] do
       "simple" -> term_aggregation(head_agg, next_node_or_leaf)
       "range" -> range_aggregation(head_agg, next_node_or_leaf)
-      "nested" -> nil
+      "nested" -> nested_aggregation_object(head_agg, next_node_or_leaf)
     end
   end
 
@@ -103,6 +103,16 @@ defmodule Graveyard.ORM.Group do
           "field" => agg["key"],
           "ranges" => build_range_agg(agg)
         },
+        "aggs" => next_node
+      }
+    }
+  end
+
+  def nested_aggregation_object(agg, next_node) do
+    %{
+      "aggregation" => %{
+        "meta" => %{"field_name" => agg["key"], "type" => :nested},
+        "terms" => %{"field" => Enum.join(["__aux", agg["opts"]["path"], agg["key"]], ".")},
         "aggs" => next_node
       }
     }
