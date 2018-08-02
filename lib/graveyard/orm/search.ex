@@ -40,7 +40,7 @@ defmodule Graveyard.ORM.Search do
       maquilate: true
     }
     opts = Map.merge(default_opts, opts)
-    
+
     case Tirexs.Query.create_resource(to_keyword_list(query)) do
       {:ok, 200, %{hits: %{hits: hits}}} ->
         %{
