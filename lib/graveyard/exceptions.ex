@@ -11,7 +11,7 @@ defmodule Graveyard.Errors do
     defexception message: "No ElasticSearch instance found"
   end
 
-  defmodule BadArgument do
+  defmodule BadArgumentError do
     defexception message: "Illegal arguments were supplied"
   end
 end

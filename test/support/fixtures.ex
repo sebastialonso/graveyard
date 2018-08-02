@@ -1,5 +1,41 @@
 defmodule Graveyard.Support.Fixtures do
-  def mappings do
+  alias Graveyard.Record
+
+  def with_nested_oblists_mappings do
+    %{
+      "sets" => %{"type" => :oblist, "schema" => %{
+        "name" => %{"type" => :text},
+        "symbol" => %{"type" => :category},
+        "examples" => %{"type" => :oblist, "schema" => %{
+          "name" => %{"type" => :category},
+          "tags" => %{"type" => :list}
+        }}
+      }}
+    }    
+  end
+
+  def simple_mappings do
+    %{
+        "episode" => %{"type" => :text},
+        "number" => %{"type" => :integer},
+        "hosts" => %{"type" => :list}
+      }
+  end
+
+  def with_object_mappings do
+    %{
+        "episode" => %{"type" => :text},
+        "number" => %{"type" => :integer},
+        "hosts" => %{"type" => :list},
+        "topic" => %{"type" => :object, "schema" => %{
+          "name" => %{"type" => :category},
+          "followers" => %{"type" => :integer},
+          "last_time_played" => %{"type" => :date}
+        }} 
+      }
+  end
+
+  def with_oblists_mappings do
     %{
       "episode" => %{"type" => :text},
       "number" => %{"type" => :category},
@@ -40,5 +76,9 @@ defmodule Graveyard.Support.Fixtures do
       %{episode: "666 The List of the Beast", number: 48, duration: 65, listeners: 8764, topic: %{name: "Satanism", followers: 432, last_time_played: "7/05/2018"},
           tags: [%{name: "Occult"}, %{name: "Ancient Aliens"}]}
     ]
+  end
+
+  def create_episodes() do
+    Enum.map(episodes(), fn(episode) -> Record.insert(episode) end)  
   end
 end

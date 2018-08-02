@@ -17,14 +17,21 @@ defmodule Graveyard.ORM.CountTest do
     end
   end
 
+  @mappings %{
+    "title" => %{"type" => :text},
+    "content" => %{"type" => :text}
+  }
+
   setup do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
-    Application.put_env(:graveyard, :mappings_module, CustomMappings)
+    Application.put_env(:graveyard, :mappings_module, nil)
+    Application.put_env(:graveyard, :mappings, @mappings)
     
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
+
     Enum.each(1..5, fn(_) -> 
       Record.insert(%{
         "title" => Faker.Name.name(),

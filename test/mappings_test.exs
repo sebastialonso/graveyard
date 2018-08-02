@@ -4,6 +4,7 @@ defmodule Graveyard.MappingsTest do
   alias Graveyard.Support
   alias Graveyard.Errors
   alias Graveyard.Mappings
+  alias Graveyard.Support.Fixtures
 
   defmodule CustomMappings do
     import Tirexs.Mapping
@@ -29,36 +30,9 @@ defmodule Graveyard.MappingsTest do
     end
   end
 
-  @last_podcast_mappings %{
-    "episode" => %{"type" => :text},
-    "number" => %{"type" => :integer},
-    "hosts" => %{"type" => :list}
-  }
-
-  @advanced_last_podcast_mappings %{
-    "episode" => %{"type" => :text},
-    "number" => %{"type" => :integer},
-    "hosts" => %{"type" => :list},
-    "topic" => %{"type" => :object, "schema" => %{
-      "name" => %{"type" => :string},
-      "followers" => %{"type" => :integer},
-      "last_time_played" => %{"type" => :date}
-    }} 
-  }
-
-  @oblist_last_podcast_mappings %{
-    "episode" => %{"type" => :text},
-    "number" => %{"type" => :integer},
-    "hosts" => %{"type" => :list},
-    "topic" => %{"type" => :object, "schema" => %{
-      "name" => %{"type" => :string},
-      "followers" => %{"type" => :integer},
-      "last_time_played" => %{"type" => :date}
-    }},
-    "tags" => %{"type" => :oblist, "schema" => %{
-      "name" => %{"type" => :string}
-    }}
-  }
+  @last_podcast_mappings Fixtures.simple_mappings()
+  @advanced_last_podcast_mappings Fixtures.with_object_mappings()
+  @oblist_last_podcast_mappings Fixtures.with_oblists_mappings()
 
   setup do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
@@ -88,6 +62,7 @@ defmodule Graveyard.MappingsTest do
 
     test "raise if custom mapping file has wrong function signature" do
       Application.put_env(:graveyard, :mappings_module, WrongSignatureMappings)
+      Application.put_env(:graveyard, :mappings, nil)
       assert_raise Errors.ConfigModuleError, fn -> Mappings.get_mappings end
     end
 

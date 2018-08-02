@@ -20,16 +20,15 @@ defmodule Graveyard.ORM.Group do
         group_query = Graveyard.ORM.Group.build_group_query(query, aggregators, opts)
           |> Tirexs.Query.create_resource
 
-        if Map.get(opts, :maquilate, false) == false do
-          group_query
+        if opts.maquilate do
+          group_query |> maquilate
         else
           group_query
-            |> maquilate
         end
       end
 
       def group(filters, aggs, opts) do
-        raise Errors.BadArgument
+        raise Errors.BadArgumentError
       end
     end
   end
@@ -62,13 +61,13 @@ defmodule Graveyard.ORM.Group do
     case head_agg["type"] do
       "simple" -> term_aggregation(head_agg, next_node_or_leaf)
       "range" -> range_aggregation(head_agg, next_node_or_leaf)
-      "nested" -> nil
+      "nested" -> nested_aggregation_object(head_agg, next_node_or_leaf)
     end
   end
 
   def numeric_aggregations() do
     averagable_fields = Support.numerical_fields()
-    aggregations = if Enum.count(averagable_fields) != 0 do
+    if Enum.count(averagable_fields) != 0 do
       averagable_fields |> Enum.reduce(%{}, fn(field, acc) -> 
         cond do
           String.starts_with?(field, "object") ->
@@ -104,6 +103,16 @@ defmodule Graveyard.ORM.Group do
           "field" => agg["key"],
           "ranges" => build_range_agg(agg)
         },
+        "aggs" => next_node
+      }
+    }
+  end
+
+  def nested_aggregation_object(agg, next_node) do
+    %{
+      "aggregation" => %{
+        "meta" => %{"field_name" => agg["key"], "type" => :nested},
+        "terms" => %{"field" => Enum.join(["__aux", agg["opts"]["path"], agg["key"]], ".")},
         "aggs" => next_node
       }
     }

@@ -5,27 +5,23 @@ defmodule Graveyard.ORM.SearchTest do
   alias Graveyard.Support
   alias Graveyard.Utils.TirexsUris
 
-  defmodule CustomMappings do
-    import Tirexs.Mapping
-
-    def get_mappings(index_name, type_name) do
-      index = [index: index_name, type: type_name]
-      mappings do
-        indexes "title", type: "keyword"
-        indexes "content", type: "text", analyzer: "nGram_analyzer"
-        indexes "tag", type: "keyword"
-        indexes "published_at", type: "date", format: "dd/MM/yyyy"
-      end
-    end
-  end
+  @mappings %{
+    "title" => %{"type" => :text},
+    "content" => %{"type" => :text},
+    "color" => %{"type" => :category},
+    "published_at" => %{"type" => :date},
+  }
 
   setup do
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
-    Application.put_env(:graveyard, :mappings_module, CustomMappings)
+    Application.put_env(:graveyard, :mappings_module, nil)
+    Application.put_env(:graveyard, :mappings, @mappings)
     
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
+
+
     docs = Enum.map(1..12, fn(i) -> 
       color = if rem(i, 2) == 1 do
         "green"
