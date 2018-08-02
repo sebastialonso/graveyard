@@ -1,7 +1,7 @@
 defmodule Graveyard.Mappings.Auxiliar do
   
   alias Graveyard.Support
-  alias Graveyard.Utils
+  import Graveyard.Utils
 
   @doc """
   Traverses recursively the configured mappings map for :oblists objects.
@@ -17,9 +17,9 @@ defmodule Graveyard.Mappings.Auxiliar do
 
     properties = Enum.map(grouped_properties, fn({key, val}) -> 
       inner_properties = Enum.reduce(val, [], fn(x, acc) -> 
-        acc ++ [{Utils.to_indifferent_atom(x.name), [type: "keyword"]}]
+        acc ++ [{to_indifferent_atom(x.name), [type: "keyword"]}]
       end)
-      {Utils.to_indifferent_atom(key), [properties: inner_properties, type: "object"]}
+      {to_indifferent_atom(key), [properties: inner_properties, type: "object"]}
     end)
     [__aux: [properties: properties, type: "object"]]
   end
@@ -55,7 +55,7 @@ defmodule Graveyard.Mappings.Auxiliar do
         Map.has_key?(value, "schema") ->
           find_fields_with_schema(%{kkey => value}, key, acc)
         Enum.member?([:category, :list], value["type"]) ->
-          acc ++ [%{nested_key: key, name: kkey}]
+          acc ++ [%{nested_key: to_indifferent_atom(key), name: to_indifferent_atom(kkey)}]
         true -> acc
       end
     end)

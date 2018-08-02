@@ -20,11 +20,10 @@ defmodule Graveyard.ORM.Group do
         group_query = Graveyard.ORM.Group.build_group_query(query, aggregators, opts)
           |> Tirexs.Query.create_resource
 
-        if Map.get(opts, :maquilate, false) == false do
-          group_query
+        if opts.maquilate do
+          group_query |> maquilate
         else
           group_query
-            |> maquilate
         end
       end
 
@@ -68,7 +67,7 @@ defmodule Graveyard.ORM.Group do
 
   def numeric_aggregations() do
     averagable_fields = Support.numerical_fields()
-    aggregations = if Enum.count(averagable_fields) != 0 do
+    if Enum.count(averagable_fields) != 0 do
       averagable_fields |> Enum.reduce(%{}, fn(field, acc) -> 
         cond do
           String.starts_with?(field, "object") ->
