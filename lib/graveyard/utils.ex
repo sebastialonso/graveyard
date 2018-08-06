@@ -51,4 +51,9 @@ defmodule Graveyard.Utils do
   def is_primitive_list(lst) do
     is_list(lst) and !Enum.any?(lst, fn x -> is_map(x) end)
   end
+
+  def now() do
+    Timex.now()
+      |> Timex.format!("%d/%m/%Y %H:%M:%S", :strftime)
+  end
 end

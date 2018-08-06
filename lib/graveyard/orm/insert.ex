@@ -25,9 +25,15 @@ defmodule Graveyard.ORM.Insert do
       %{index: Support.index(), type: Support.type()}, 
       opts
     )
-    
-    raw = raw
+      
+    raw = if Enum.empty?(Graveyard.Mappings.Auxiliar.find_fields_with_schema(raw)) do
+      raw
+      |> add_timestamps()
+    else
+      raw
       |> Map.put(:__aux, auxiliar_nested_fields(raw))
+      |> add_timestamps()
+    end
 
     case post("#{index}/#{type}", raw) do
       {:ok, 201, object} ->
@@ -74,5 +80,11 @@ defmodule Graveyard.ORM.Insert do
     Enum.map(lst, fn(x) -> 
       x[key]
     end) |> Enum.uniq
+  end
+
+  defp add_timestamps(document) do
+    document
+      |> Map.put(:created_at, now())
+      |> Map.put(:updated_at, now())
   end
 end
