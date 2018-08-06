@@ -30,11 +30,6 @@ use Mix.Config
 config :tirexs,
   :uri, "http://127.0.0.1:9200"
 
-# config :graveyard,
-#   index: "graveyard",
-#   type: "graveyard",
-#   mappings: CustomMappingsForGraveyard
-
 if Mix.env == :test do
   import_config "#{Mix.env}.exs"
 end

@@ -17,15 +17,12 @@ defmodule Graveyard.ORM.InsertTest do
     end
   end
 
-  setup_all do
+  setup do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
     Application.put_env(:graveyard, :mappings_module, CustomMappings)
-    :ok
-  end
-
-  setup do
+    Application.put_env(:graveyard, :mappings, nil)
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
     :ok
@@ -38,5 +35,14 @@ defmodule Graveyard.ORM.InsertTest do
     }
     
     assert {:ok, %{id: _}} = Record.insert(record)
+  end
+
+  test "records has created_at and updated_at" do
+    record = %{
+      "title" => "Henry",
+      "content" => "It's the Bilderberg group!"
+    }
+    
+    assert {:ok, %{created_at: _, updated_at: _}} = Record.insert(record)
   end
 end

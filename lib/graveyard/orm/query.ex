@@ -4,6 +4,7 @@ defmodule Graveyard.ORM.Query do
   import Graveyard.ORM.Query.Range
   import Graveyard.ORM.Query.Ids
   import Graveyard.ORM.Query.Exists
+  import Graveyard.ORM.Query.Nested
 
   def build_query(filters) do
     case Enum.empty?(filters) do
@@ -49,7 +50,7 @@ defmodule Graveyard.ORM.Query do
   defp get_must_from_filters(filters) do
     filters |> Enum.filter(fn(constraint) -> 
       Enum.member?(
-        ["range", "match", "ids", "exists"], 
+        ["range", "match", "ids", "exists", "nested"], 
         Map.get(constraint, "type")
       )
     end)
@@ -86,6 +87,8 @@ defmodule Graveyard.ORM.Query do
         ids_query filter
       "exists" ->
         exists_query filter
+      "nested" ->
+        nested_query filter
     end
   end
 

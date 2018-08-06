@@ -43,4 +43,17 @@ defmodule Graveyard.Utils do
       true -> key
     end
   end
+
+  def is_list_of_maps(lst) do
+    is_list(lst) and Enum.all?(lst, fn(item) -> is_map(item) end)
+  end
+
+  def is_primitive_list(lst) do
+    is_list(lst) and !Enum.any?(lst, fn x -> is_map(x) end)
+  end
+
+  def now() do
+    Timex.now()
+      |> Timex.format!("%d/%m/%Y %H:%M:%S", :strftime)
+  end
 end

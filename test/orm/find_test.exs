@@ -17,15 +17,12 @@ defmodule Graveyard.ORM.FindTest do
     end
   end
 
-  setup_all do
+  setup do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
     Application.put_env(:graveyard, :mappings_module, CustomMappings)
-    :ok
-  end
-
-  setup do
+    
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
     record = %{

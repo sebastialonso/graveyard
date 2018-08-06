@@ -4,11 +4,11 @@ defmodule Graveyard.Mixfile do
   def project do
     [
       app: :graveyard,
-      version: "0.3.0",
+      version: "0.4.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
-      elixirc_path: elixirc_path(Mix.env),
+      elixirc_paths: elixirc_path(Mix.env),
       description: description(),
       source_url: github(),
       package: package()

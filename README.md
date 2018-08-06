@@ -1,6 +1,6 @@
 # Graveyard
 
-[![Hex.pm](https://img.shields.io/badge/hex-0.3.0-blue.svg)](https://hex.pm/packages/graveyard)
+[![Hex.pm](https://img.shields.io/badge/hex-0.4.0-blue.svg)](https://hex.pm/packages/graveyard)
 
 A teeny-tiny ORM/library for managing ElasticSearch
 
@@ -11,7 +11,7 @@ Just add
 ```elixir
 def deps do
   [
-    {:graveyard, "~> 0.3.0"}
+    {:graveyard, "~> 0.4.0"}
   ]
 end
 ```
