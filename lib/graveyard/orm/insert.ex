@@ -8,7 +8,13 @@ defmodule Graveyard.ORM.Insert do
       Stores a map into ElasticsSearch. Returns {:ok, record} if success, {:error, error} otherwise
       """
       def insert(raw, opts \\ %{}) do
-        Graveyard.ORM.Insert.do_save(raw, opts)
+        cond do
+          is_map(raw) ->
+            Graveyard.ORM.Insert.do_save(raw, opts)
+          is_list(raw) and Enum.map(raw, fn(x) -> is_map(x) end) ->
+            Graveyard.ORM.Bulk.Insert.insert(raw, opts)
+          true -> raise Errors.BadArgumentError, message: ":raw must be a map or list of maps."
+        end
       end
 
     end
@@ -17,31 +23,33 @@ defmodule Graveyard.ORM.Insert do
   alias Graveyard.Support
   alias Graveyard.Record
   alias Graveyard.Mappings.Auxiliar
+  alias Graveyard.ORM.Opts
   import Graveyard.Utils
   import Tirexs.HTTP
 
   def do_save(raw, opts) do
-    %{index: index, type: type} = Map.merge(
-      %{index: Support.index(), type: Support.type()}, 
-      opts
-    )
+    opts = opts
+      |> Opts.Insert.options
       
-    raw = if Enum.empty?(Graveyard.Mappings.Auxiliar.find_fields_with_schema(raw)) do
-      raw
-      |> add_timestamps()
-    else
-      raw
-      |> Map.put(:__aux, auxiliar_nested_fields(raw))
-      |> add_timestamps()
-    end
+    ready_to_insert = prepare_object(raw)
 
-    case post("#{index}/#{type}", raw) do
+    case post("#{opts.index}/#{opts.type}", ready_to_insert) do
       {:ok, 201, object} ->
-        {:ok, Record.find(object._id, %{index: index, type: type})}
+        {:ok, Record.find(object._id, opts)}
       {:error, status, error} ->
         IO.inspect(status) 
         IO.inspect(error) 
         {:error, error}
+    end
+  end
+
+  def prepare_object(raw) do
+    if Enum.empty?(Graveyard.Mappings.Auxiliar.find_fields_with_schema()) do
+      raw |> add_timestamps()
+    else
+      raw
+        |> Map.put(:__aux, auxiliar_nested_fields(raw))
+        |> add_timestamps()
     end
   end
 

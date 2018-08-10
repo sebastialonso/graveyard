@@ -24,7 +24,7 @@ defmodule Graveyard.Mappings.Auxiliar do
     [__aux: [properties: properties, type: "object"]]
   end
 
-  def find_fields_with_schema(mmap, parent_key \\ "", accumulator \\ []) do
+  def find_fields_with_schema(mmap \\ Support.mappings, parent_key \\ "", accumulator \\ []) do
     mmap |> Enum.reduce(accumulator, fn({key, val}, acc) ->
       if is_map(val) do
         if Map.has_key?(val, "schema") do
