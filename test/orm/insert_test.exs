@@ -26,22 +26,28 @@ defmodule Graveyard.ORM.InsertTest do
     Application.put_env(:graveyard, :mappings, Fixtures.with_oblists_mappings())
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
-    [episode: Fixtures.episodes() |> List.first]
+    [episodes: Fixtures.episodes()]
   end
 
-  test "inserts a record", %{episode: episode} do
+  test "inserts a record", %{episodes: episodes} do
     old_count = Record.count()
-    Record.insert(episode)
+    Record.insert(episodes |> List.first)
     assert old_count < Record.count()
   end
 
-  test "records has created_at and updated_at", %{episode: episode} do
-    assert {:ok, %{created_at: _, updated_at: _}} = Record.insert(episode)
+  test "records has created_at and updated_at", %{episodes: episodes} do
+    assert {:ok, %{created_at: _, updated_at: _}} = Record.insert(episodes |> List.first)
   end
 
-  test "for oblists, the __aux field is populated", %{episode: episode} do
-    {:ok, record} = Record.insert(episode, %{maquilate: false})
+  test "for oblists, the __aux field is populated", %{episodes: episodes} do
+    {:ok, record} = Record.insert(episodes |> List.first, %{maquilate: false})
     aux = Map.get(record, :_source) |> Map.get(:__aux)
     assert Enum.count(aux) > 0
+  end
+
+  test "returns a list of ids", %{episodes: episodes} do
+    actual = Record.insert(episodes)
+    assert is_list(actual)
+    assert Enum.count(actual) > 0
   end
 end

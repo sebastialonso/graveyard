@@ -12,7 +12,7 @@ defmodule Graveyard.ORM.Insert do
           is_map(raw) ->
             Graveyard.ORM.Insert.do_save(raw, opts)
           is_list(raw) and Enum.map(raw, fn(x) -> is_map(x) end) ->
-            Graveyard.ORM.Bulk.insert(raw, opts)
+            Graveyard.ORM.Bulk.Insert.insert(raw, opts)
           true -> raise Errors.BadArgumentError, message: ":raw must be a map or list of maps."
         end
       end
