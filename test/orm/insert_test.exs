@@ -4,6 +4,7 @@ defmodule Graveyard.ORM.InsertTest do
   alias Graveyard.Record
   alias Graveyard.Support
   alias Graveyard.Utils.TirexsUris
+  alias Graveyard.Support.Fixtures
 
   defmodule CustomMappings do
     import Tirexs.Mapping
@@ -21,28 +22,26 @@ defmodule Graveyard.ORM.InsertTest do
     Application.put_env(:tirexs, :uri, "http://localhost:9200")
     Application.put_env(:graveyard, :index, "graveyard_test")
     Application.put_env(:graveyard, :type, "graveyard_test")
-    Application.put_env(:graveyard, :mappings_module, CustomMappings)
-    Application.put_env(:graveyard, :mappings, nil)
+    Application.put_env(:graveyard, :mappings_module, nil)
+    Application.put_env(:graveyard, :mappings, Fixtures.with_oblists_mappings())
     TirexsUris.delete_mapping()
     Graveyard.Mappings.create_settings_and_mappings()
-    :ok
+    [episode: Fixtures.episodes() |> List.first]
   end
 
-  test "inserts a record" do
-    record = %{
-      "title" => "Henry",
-      "content" => "It's the Bilderberg group!"
-    }
-    
-    assert {:ok, %{id: _}} = Record.insert(record)
+  test "inserts a record", %{episode: episode} do
+    old_count = Record.count()
+    Record.insert(episode)
+    assert old_count < Record.count()
   end
 
-  test "records has created_at and updated_at" do
-    record = %{
-      "title" => "Henry",
-      "content" => "It's the Bilderberg group!"
-    }
-    
-    assert {:ok, %{created_at: _, updated_at: _}} = Record.insert(record)
+  test "records has created_at and updated_at", %{episode: episode} do
+    assert {:ok, %{created_at: _, updated_at: _}} = Record.insert(episode)
+  end
+
+  test "for oblists, the __aux field is populated", %{episode: episode} do
+    {:ok, record} = Record.insert(episode, %{maquilate: false})
+    aux = Map.get(record, :_source) |> Map.get(:__aux)
+    assert Enum.count(aux) > 0
   end
 end
