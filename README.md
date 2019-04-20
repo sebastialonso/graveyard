@@ -1,10 +1,6 @@
 # Graveyard
 
-<<<<<<< HEAD
 [![Hex.pm](https://img.shields.io/badge/hex-0.6.0-blue.svg)](https://hex.pm/packages/graveyard) [![Tests](https://img.shields.io/badge/test-47%20passed%2C%200%20failed-green.svg)](https://github.com/sebastialonso/graveyard/tree/master/test)
-=======
-[![Hex.pm](https://img.shields.io/badge/hex-0.5.0-blue.svg)](https://hex.pm/packages/graveyard) [![Tests](https://img.shields.io/badge/test-47%20passed%2C%200%20failed-green.svg)](https://github.com/sebastialonso/graveyard/tree/master/test)
->>>>>>> 52abc777f3d0a013e8d07b31961a87b179a4b7ef
 
 A teeny-tiny ORM/library for managing ElasticSearch
 
