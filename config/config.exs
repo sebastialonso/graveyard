@@ -32,7 +32,20 @@ config :tirexs,
 
 config :graveyard,
   date_format: ~r/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$/,
-  datetime_format: ~r/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$/
+  datetime_format: ~r/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$/,
+  validate_before_insert: false,
+  validate_before_update: false
+
+config :vex,
+  sources: [
+    [text: Graveyard.Validators.Text],
+    [integer: Graveyard.Validators.Integer],
+    [number: Graveyard.Validators.Number],
+    [category: Graveyard.Validators.Category],
+    [date: Graveyard.Validators.Date],
+    [datetime: Graveyard.Validators.Datetime],
+    Vex.Validators
+  ]
 
 if Mix.env == :test do
   import_config "#{Mix.env}.exs"

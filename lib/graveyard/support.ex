@@ -80,4 +80,18 @@ defmodule Graveyard.Support do
   def datetime_format() do
     Application.get_env(:graveyard, :datetime_format)
   end
+
+  @doc """
+  Returns the configured value of the validate before insertion option
+  """
+  def validate_before_insert() do
+    Application.get_env(:graveyard, :validate_before_insert, false) 
+  end
+
+  @doc """
+  Returns the configured value of the validate before update option
+  """
+  def validate_before_update() do
+    Application.get_env(:graveyard, :validate_before_update, false) 
+  end
 end

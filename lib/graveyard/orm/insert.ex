@@ -20,7 +20,6 @@ defmodule Graveyard.ORM.Insert do
     end
   end
 
-  alias Graveyard.Support
   alias Graveyard.Record
   alias Graveyard.Mappings.Auxiliar
   alias Graveyard.ORM.Opts
@@ -32,23 +31,20 @@ defmodule Graveyard.ORM.Insert do
     opts = opts
       |> Opts.Insert.options
     
-    # TODO Check if validation is active first
-    validated = validate(raw)
-    
-    cond do
-      Map.has_key?(validated, :__valid__) and validated.__valid__ ->
-        ready_to_insert = add_aux_fields(raw)
-    
-        case post("#{opts.index}/#{opts.type}", ready_to_insert) do
-          {:ok, 201, object} ->
-            {:ok, Record.find(object._id, opts)}
-          {:error, status, error} ->
-            IO.inspect(status) 
-            IO.inspect(error) 
-            {:error, error}
-        end
-      true -> 
-        {:error, :validation_failure, validated.__errors__}
+    if opts.validate_before_insert do
+      # Transform input to atom-keyed map
+      validated = raw
+        |> to_indifferent_map
+        |> validate
+      case validated.__valid__ do
+        true ->
+          validated = Map.drop(validated, [:__valid__, :__errors__])
+          attempt_to_insert(validated, opts)
+        false ->
+          {:error, :validation_failure, validated.__errors__}
+      end
+    else
+      attempt_to_insert(raw, opts)
     end
   end
 
@@ -103,5 +99,18 @@ defmodule Graveyard.ORM.Insert do
     document
       |> Map.put(:created_at, now())
       |> Map.put(:updated_at, now())
+  end
+
+  defp attempt_to_insert(input, opts) do
+    ready_to_insert = add_aux_fields(input)
+    
+    case post("#{opts.index}/#{opts.type}", ready_to_insert) do
+      {:ok, 201, object} ->
+        {:ok, Record.find(object._id, opts)}
+      {:error, status, error} ->
+        IO.inspect(status) 
+        IO.inspect(error) 
+        {:error, error}
+    end
   end
 end
