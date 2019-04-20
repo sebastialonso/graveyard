@@ -4,7 +4,7 @@ defmodule Graveyard.Mixfile do
   def project do
     [
       app: :graveyard,
-      version: "0.5.0",
+      version: "0.6.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
@@ -28,7 +28,9 @@ defmodule Graveyard.Mixfile do
       {:tirexs, "~> 0.8"},
       {:faker, "~> 0.10", only: :test},
       {:timex, "~> 3.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:vex, "~> 0.8.0"},
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
   end
 

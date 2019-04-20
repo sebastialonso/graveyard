@@ -11,7 +11,7 @@ defmodule Graveyard.ORM.Bulk.Insert do
         is_list(raw) and Enum.map(raw, fn(x) -> is_map(x) end) ->
           opts = opts |> Opts.Insert.options
           raw = raw
-            |> Enum.map(&Insert.prepare_object/1)
+            |> Enum.map(&Insert.add_aux_fields/1)
             |> do_bulk_save(opts)
             |> ids_from_created
         true -> raise Errors.BadArgumentError, message: ":raw must be a list of maps."

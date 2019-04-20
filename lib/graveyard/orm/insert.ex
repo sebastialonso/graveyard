@@ -20,30 +20,35 @@ defmodule Graveyard.ORM.Insert do
     end
   end
 
-  alias Graveyard.Support
   alias Graveyard.Record
   alias Graveyard.Mappings.Auxiliar
   alias Graveyard.ORM.Opts
   import Graveyard.Utils
+  import Graveyard.ORM.Validation
   import Tirexs.HTTP
 
   def do_save(raw, opts) do
     opts = opts
       |> Opts.Insert.options
-      
-    ready_to_insert = prepare_object(raw)
-
-    case post("#{opts.index}/#{opts.type}", ready_to_insert) do
-      {:ok, 201, object} ->
-        {:ok, Record.find(object._id, opts)}
-      {:error, status, error} ->
-        IO.inspect(status) 
-        IO.inspect(error) 
-        {:error, error}
+    
+    if opts.validate_before_insert do
+      # Transform input to atom-keyed map
+      validated = raw
+        |> to_indifferent_map
+        |> validate
+      case validated.__valid__ do
+        true ->
+          validated = Map.drop(validated, [:__valid__, :__errors__])
+          attempt_to_insert(validated, opts)
+        false ->
+          {:error, :validation_failure, validated.__errors__}
+      end
+    else
+      attempt_to_insert(raw, opts)
     end
   end
 
-  def prepare_object(raw) do
+  def add_aux_fields(raw) do
     if Enum.empty?(Graveyard.Mappings.Auxiliar.find_fields_with_schema()) do
       raw |> add_timestamps()
     else
@@ -94,5 +99,18 @@ defmodule Graveyard.ORM.Insert do
     document
       |> Map.put(:created_at, now())
       |> Map.put(:updated_at, now())
+  end
+
+  defp attempt_to_insert(input, opts) do
+    ready_to_insert = add_aux_fields(input)
+    
+    case post("#{opts.index}/#{opts.type}", ready_to_insert) do
+      {:ok, 201, object} ->
+        {:ok, Record.find(object._id, opts)}
+      {:error, status, error} ->
+        IO.inspect(status) 
+        IO.inspect(error) 
+        {:error, error}
+    end
   end
 end
