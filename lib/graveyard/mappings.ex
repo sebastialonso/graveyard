@@ -21,7 +21,7 @@ defmodule Graveyard.Mappings do
     mappings_from_config = cond do
       !is_module_present and !is_map_present ->
         raise Errors.ConfigModuleError, "Only one of :mappings or :mappings_module must be set in config"
-      is_map_present and Enum.count(Support.mappings) > 1 ->
+      is_map_present and Enum.count(Support.mappings) > 0 ->
         Builder.get_mappings(index_name, type_name)
       is_module_present ->
         Basic.get_mappings(index_name, type_name)

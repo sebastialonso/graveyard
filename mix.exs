@@ -28,7 +28,9 @@ defmodule Graveyard.Mixfile do
       {:tirexs, "~> 0.8"},
       {:faker, "~> 0.10", only: :test},
       {:timex, "~> 3.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:vex, "~> 0.8.0"},
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
   end
 

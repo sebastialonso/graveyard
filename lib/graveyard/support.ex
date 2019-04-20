@@ -66,4 +66,18 @@ defmodule Graveyard.Support do
         end
       end) |> List.flatten
   end
+
+  @doc """
+  Returns the configured regex to validate format of date strings
+  """
+  def date_format() do
+    Application.get_env(:graveyard, :date_format)
+  end
+
+  @doc """
+  Returns the configured regex to validate format of datetime strings
+  """
+  def datetime_format() do
+    Application.get_env(:graveyard, :datetime_format)
+  end
 end
