@@ -34,7 +34,7 @@ defmodule Graveyard.ORM.Update do
               {:error, :validation_failure, validated.__errors__}
           end
         else
-          attempt_to_update(id, params, opts)
+          attempt_to_update(id, updated, opts)
         end
     end
   end
