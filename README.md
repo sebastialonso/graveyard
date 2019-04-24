@@ -11,7 +11,7 @@ Just add
 ```elixir
 def deps do
   [
-    {:graveyard, "~> 0.5.0"}
+    {:graveyard, "~> 0.6.1"}
   ]
 end
 ```
@@ -47,7 +47,7 @@ config :graveyard,
 
 ## Mappings
 
-There's two wayw to supply mappings to Graveyard. Passing an object that follow the Graveyard type system (recommended) or passing a module.
+There's two ways to supply mappings to Graveyard. Passing an object that follows the Graveyard type system (recommended) or passing a module.
 
 For the first way, pass a `mappings` key to the configuration with the mappings map as the value.
 
