@@ -82,6 +82,20 @@ defmodule Graveyard.Support do
   end
 
   @doc """
+  Returns the configured format of date for ElasticSearch mappings
+  """
+  def date_elasticsearch_format() do
+    Application.get_env(:graveyard, :date_elasticsearch_format)
+  end
+
+  @doc """
+  Returns the configured format of date for ElasticSearch mappings
+  """
+  def datetime_elasticsearch_format() do
+    Application.get_env(:graveyard, :datetime_elasticsearch_format)
+  end
+
+  @doc """
   Returns the configured value of the validate before insertion option
   """
   def validate_before_insert() do
