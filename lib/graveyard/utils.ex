@@ -2,6 +2,8 @@ defmodule Graveyard.Utils do
   @moduledoc """
   Various utility functions
   """
+  alias Graveyard.Support
+  
   def to_keyword_list(map) do
     Enum.map(map, fn({key, value}) ->
       case value do
@@ -54,6 +56,6 @@ defmodule Graveyard.Utils do
 
   def now() do
     Timex.now()
-      |> Timex.format!("%d/%m/%Y %H:%M:%S", :strftime)
+      |> Timex.format!(Support.datetime_timex_format(), :strftime)
   end
 end

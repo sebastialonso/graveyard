@@ -96,6 +96,13 @@ defmodule Graveyard.Support do
   end
 
   @doc """
+  Returns the configured format of datetime for Timex
+  """
+  def datetime_timex_format() do
+    Application.get_env(:graveyard, :datetime_timex_format, "%Y-%m-%dT%H:%M:%s")
+  end
+
+  @doc """
   Returns the configured value of the validate before insertion option
   """
   def validate_before_insert() do
