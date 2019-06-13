@@ -43,7 +43,7 @@ defmodule Graveyard.ORM.Query do
     filters
     |> get_shoulds_from_filters
     |> Enum.reduce([], fn(constraint, acc) -> 
-      acc + [build_bool_should(constraint)]
+      acc ++ [build_bool_should(constraint)]
     end)
   end
 

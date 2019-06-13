@@ -9,7 +9,6 @@ defmodule Graveyard.ORM.Query.ShouldMatch do
   """
   def should_match_query filter do
     filter["values"] |> Enum.map(fn(constraint_value) -> 
-      IO.inspect constraint_value
       %{match: Map.new([{to_indifferent_atom(filter["field"]), %{query: constraint_value, operator: "and"}}])}
     end)
   end
