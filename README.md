@@ -11,7 +11,7 @@ Just add
 ```elixir
 def deps do
   [
-    {:graveyard, "~> 0.6.4"}
+    {:graveyard, "~> 0.6.5"}
   ]
 end
 ```
