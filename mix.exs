@@ -4,7 +4,7 @@ defmodule Graveyard.Mixfile do
   def project do
     [
       app: :graveyard,
-      version: "0.6.5",
+      version: "0.6.6",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
