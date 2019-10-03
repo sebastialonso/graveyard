@@ -36,6 +36,8 @@ defmodule Graveyard.ORM.Group do
   alias Graveyard.Utils
   alias Graveyard.Support
 
+  @bucket_number 10_000
+
   def build_aggs_query(aggs) do
     %{"aggs" => Graveyard.ORM.Group.agg_node_element(aggs)}
     |> Utils.to_keyword_list
@@ -89,7 +91,7 @@ defmodule Graveyard.ORM.Group do
     %{
       "aggregation" => %{
         "meta" => %{"field_name" => agg["key"], "type" => :simple},
-        "terms" => %{"field" => agg["key"]},
+        "terms" => %{"field" => agg["key"], "size" => @bucket_number},
         "aggs" => next_node
       }
     }
